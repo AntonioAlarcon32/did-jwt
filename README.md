@@ -25,12 +25,6 @@ If your DID method requires a different signing algorithm than what is already s
 npm install https://github.com/AntonioAlarcon32/did-jwt#dist
 ```
 
-or if you use `yarn`
-
-```bash
-yarn add did-jwt
-```
-
 ## Example
 
 ### 1. Create a did-JWT
