@@ -1,9 +1,9 @@
-import SimpleSigner from './signers/SimpleSigner.js'
-import EllipticSigner from './signers/EllipticSigner.js'
-import NaclSigner from './signers/NaclSigner.js'
-import { ES256KSigner } from './signers/ES256KSigner.js'
-import { ES256Signer } from './signers/ES256Signer.js'
-import { EdDSASigner } from './signers/EdDSASigner.js'
+import SimpleSigner from './software-signer/signers/SimpleSigner.js'
+import EllipticSigner from './software-signer/signers/EllipticSigner.js'
+import NaclSigner from './software-signer/signers/NaclSigner.js'
+import { ES256KSigner } from './software-signer/signers/ES256KSigner.js'
+import { ES256Signer } from './software-signer/signers/ES256Signer.js'
+import { EdDSASigner } from './software-signer/signers/EdDSASigner.js'
 import {
   createJWS,
   createJWT,
@@ -16,7 +16,6 @@ import {
   verifyJWS,
   verifyJWT,
 } from './JWT.js'
-
 export { toEthereumAddress, concatKDF } from './Digest.js'
 
 export { createJWE, decryptJWE } from './encryption/JWE.js'
@@ -58,6 +57,14 @@ export {
   type JWTPayload,
   type JWTVerified,
 }
+
+export { AbstractSigner } from './AbstractSigner.js'
+export { AbstractVerifier } from './AbstractVerifier.js'
+
+export { SoftwareSigner } from './software-signer/SoftwareSigner.js'
+export type { SignAlgorithm } from './software-signer/SoftwareSigner.js'
+
+export { SoftwareVerifier } from './software-verifier/SoftwareVerifier.js'
 
 export { type JWTOptions, type JWTVerifyOptions } from './JWT.js'
 
