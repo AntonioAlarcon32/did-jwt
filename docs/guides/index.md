@@ -177,3 +177,95 @@ async function mySigner(data: Uint8Array | string): Promise<string> {
 Your function must returns a `Promise<string>`.
 
 A successful call resolves to a `base64url`-encoded signature.
+
+
+### Creating Signer objects
+
+A signer object can be created using the SoftwareSigner class.
+
+```js
+import { SoftwareSigner } from 'did-jwt'
+const signer: SoftwareSigner = new SoftwareSigner(EdDSASigner(
+  '4AcB6rb1mUBf82U7pBzPZ53ZAQycdi4Q1LWoUREvHSRXBRo9Sus9bzCJPKVTQQeDpjHMJN7fBAGWKEnJw5SPbaC4'
+), 'EdDSA')
+```
+
+This class can be used to sign JWTs in the same manner as with function signers
+```js
+createJWT(
+  { aud: 'did:key:z6Mkfriq1MqLBoPWecGoDLjguo1sB9brj6wT3qZ5BxkKpuP6', exp: 1485321133, name: 'Bob Smith' },
+  { issuer: 'did:key:z6Mkfriq1MqLBoPWecGoDLjguo1sB9brj6wT3qZ5BxkKpuP6', signer },
+  { alg: 'EdDSA' }
+).then((jwt) => {
+  console.log(jwt)
+})
+```
+
+### Creating Verifier objects
+
+Verifier objects can be created:
+```js
+import { SoftwareVerifier } from 'did-jwt'
+const verifier: SoftwareVerifier = new SoftwareVerifier()
+```
+
+The verifier can be used as a parameter in the verifyJWT function
+```js
+import { verifyJWT } from 'did-jwt'
+import { Resolver } from 'did-resolver'
+
+const resolver = new Resolver({...})
+
+verifyJWT('eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NksifQ.eyJpc3MiOiJkaWQ6dXBvcn....', {
+  resolver,
+  audience: 'Your DID'
+}, verifier).then(({ payload, doc, did, signer, jwt }) => {
+  console.log(payload)
+})
+```
+If no verifier is passed, the function will use a software verifier with the algorithms implemented in the library.
+
+### Implementing custom signers and verifiers
+
+Custom signers can be implemented by extending the class `AbstractSigner`
+
+Custom implementations must implement the `supportedAlgorithms` with the algorithms that can be used with the signer. They also have to implement the sign method, returning the signature as a string.
+
+```js
+import { AbstractSigner } from 'did-jwt'
+
+const supportedAlgorithms = ["TEST"]
+
+class SampleSigner extends AbstractSigner {
+    static supportedAlgorithms?: string[] = supportedAlgorithms
+    constructor() {...}
+    async sign (data: string | Uint8Array, algorithm: string): Promise<string> {...}
+}
+```
+
+This signer can be used as a parameter in the `createJWT` function
+
+Verifiers must extend the `AbstractVerifier` class, and must implement the `getSupportedVerificationMethods` and `verify` functions. `verify` must return the Verification Method that signed the JWT.
+
+```js
+import { AbstractVerifier } from 'did-jwt'
+
+const verificationMethods: string[] = [
+  'EcdsaSecp256k1RecoveryMethod2020'
+]
+
+class SampleVerifier extends AbstractVerifier {
+  getSupportedVerificationMethods (alg?: string): string[] {
+    if (alg === 'TEST') {
+      return verificationMethods
+    }
+    return []
+  }
+  verify (
+    alg: string,
+    data: string,
+    signature: string,
+    authenticators: VerificationMethod[]
+  ): VerificationMethod {...}
+}
+```
